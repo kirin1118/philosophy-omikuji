@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>哲学おみくじ</title>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700&display=swap" rel="stylesheet" />
+  <script src="fortunes.js"></script>
+  <style>
+    body {
+      background-color: #f4f1ea;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      overflow-x: hidden;
+      transition: background 0.4s;
+    }
+
+    h1 {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-size: 2.4em;
+      color: #4a3f35;
+      margin: 10px 0;
+      line-height: 1.4;
+    }
+
+    .description {
+      font-size: 0.95em;
+      margin-bottom: 20px;
+      color: #444;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .omikuji-icon {
+      width: 100px;
+      height: auto;
+      margin-bottom: 10px;
+      animation: shake 0s infinite;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border-radius: 10px;
+      border: none;
+      background-color: #6c584c;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #resultArea {
+      margin-top: 40px;
+    }
+
+    .message-box {
+      background: #fff;
+      border-radius: 15px;
+      padding: 30px 20px 60px;
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      font-size: 1.3em;
+      font-weight: bold;
+      max-width: 85%;
+      margin: 20px auto;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      text-align: left;
+      position: relative;
+    }
+
+    #result {
+      text-decoration: underline;
+      text-decoration-color: #4a3f35;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 6px;
+      margin-bottom: 20px;
+    }
+
+    .gold-text {
+      color: #d4af37;
+    }
+
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    #dogImage {
+      width: 90px;
+      height: auto;
+      border-radius: 50%;
+      display: none;
+    }
+
+    #ending {
+      font-size: 0.8em;
+      color: #555;
+      max-width: 65%;
+      display: none;
+    }
+
+    #againButton {
+      margin-top: 30px;
+      display: none;
+    }
+
+    .background-omikuji {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url("person_gold.png");
+      background-repeat: repeat;
+      background-size: 80px;
+      opacity: 0.08;
+      animation: moveBackground 20s linear infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      pointer-events: none;
+      z-index: 999;
+      display: none;
+    }
+
+    @keyframes moveBackground {
+      0% { background-position: 0 0; }
+      100% { background-position: 100px 100px; }
+    }
+
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      50% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .gold-mode {
+      background-image: url('person_gold.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      color: #d4af37;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-omikuji" id="bgPattern" style="display: none;"></div>
+  <div class="confetti" id="confetti"></div>
+
+  <img src="book.png" alt="おみくじアイコン" class="omikuji-icon" id="iconShake" />
+  <h1>哲学おみくじ</h1>
+  <div class="description">
+    「くすっ」と笑えてちょっと元気が出る。<br />
+    哲学のスパイスをきかせたおみくじです。
+  </div>
+  <button id="drawButton" onclick="drawOmikuji()">ポチッとな</button>
+
+  <div id="resultArea">
+    <div class="message-box">
+      <div id="result"></div>
+      <div class="footer-container">
+        <div id="ending"></div>
+        <img id="dogImage" src="person.png" alt="通常画像" />
+      </div>
+    </div>
+    <button id="againButton" onclick="resetOmikuji()">もう一度引く</button>
+  </div>
+
+  <script>
+    function drawOmikuji() {
+      const drawBtn = document.getElementById("drawButton");
+      const result = document.getElementById("result");
+      const ending = document.getElementById("ending");
+      const dog = document.getElementById("dogImage");
+      const again = document.getElementById("againButton");
+      const bg = document.getElementById("bgPattern");
+      const icon = document.getElementById("iconShake");
+      const confetti = document.getElementById("confetti");
+
+      drawBtn.style.display = "none";
+      result.innerText = "・・・ふるふる・・・";
+      ending.innerText = "";
+      icon.style.animation = "shake 0.5s infinite";
+      dog.style.display = "none";
+      ending.style.display = "none";
+      again.style.display = "none";
+      bg.style.display = "none";
+      confetti.style.display = "none";
+
+      document.body.classList.remove("gold-mode");
+      result.classList.remove("gold-text");
+      dog.src = "person.png";
+
+      setTimeout(() => {
+        icon.style.animation = "none";
+        const isGold = Math.random() < 0.05;
+        const pool = fortunes.filter(f => f.type === (isGold ? "gold" : "normal"));
+        const resultData = pool[Math.floor(Math.random() * pool.length)];
+
+        result.innerText = resultData.fortune + "\n" + resultData.comment;
+        ending.innerText = resultData.advice;
+
+        if (isGold) {
+          document.body.classList.add("gold-mode");
+          result.classList.add("gold-text");
+          dog.src = "person_gold.png";
+          confetti.style.display = "block";
+        setTimeout(() => {
+          confetti.style.display = "none";
+        }, 1500);
+        }
+
+        dog.style.display = "block";
+        ending.style.display = "block";
+        again.style.display = "inline-block";
+        bg.style.display = "block";
+      }, 3000);
+    }
+
+    function resetOmikuji() {
+      document.getElementById("drawButton").style.display = "inline-block";
+      document.getElementById("result").innerText = "";
+      document.getElementById("ending").innerText = "";
+      document.getElementById("againButton").style.display = "none";
+      document.getElementById("dogImage").style.display = "none";
+      document.getElementById("ending").style.display = "none";
+      document.getElementById("bgPattern").style.display = "none";
+      document.getElementById("confetti").style.display = "none";
+      document.body.classList.remove("gold-mode");
+      document.getElementById("dogImage").src = "person.png";
+      document.getElementById("result").classList.remove("gold-text");
+    }
+  </script>
+</body>
+</html>
